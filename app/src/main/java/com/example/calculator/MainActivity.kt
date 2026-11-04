@@ -17,15 +17,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calculator.ui.theme.CalculatorTheme
 import androidx.compose.runtime.saveable.rememberSaveable
-
+import org.mariuszgromada.math.mxparser.License
 class MainActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+
         // Wypisanie zawartości Bundle do dziennika (Logcat)
         android.util.Log.d("CalcState", "Zapisany stan Bundle: $outState")
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Wymóg licencji mXparser dla celów edukacyjnych/niekomercyjnych
+        License.iConfirmNonCommercialUse("Uzytek dydaktyczny - Laboratorium PSM")
         setContent {
             CalculatorTheme {
                 Surface(
@@ -54,10 +57,19 @@ fun CalculatorScreen() {
 
     // Wspólna funkcja obsługi kliknięcia przycisków
     val handleButtonClick: (CalcButton) -> Unit = { btn ->
+        if (expression.startsWith("Błąd") && btn.symbol != "C") {
+            expression = ""
+        }
         when (btn.symbol) {
+
             "C" -> expression = ""
             "⌫" -> if (expression.isNotEmpty()) expression = expression.dropLast(1)
-            "=" -> { /* Obliczenia realizowane w części 2 */ }
+            "=" -> {
+                val calcResult = CalculatorEngine.evaluate(expression)
+                if (calcResult.isNotEmpty()) {
+                    expression = calcResult
+                }
+            }
             else -> expression += btn.onClickValue
         }
     }
