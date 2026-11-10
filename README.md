@@ -69,3 +69,38 @@ Celem pierwszej części projektu kalkulatora było zbudowanie w pełni responsy
 |:---:|
 | ![Poziomy](screenshots/landscape.png) |
 
+---
+
+## Część 2: Logika obliczeń, testy i dopracowanie (Laboratorium 5)
+
+Druga część projektu zrealizowała pełną obsługę obliczeń z zachowaniem kolejności działań, odporność na błędy, separację logiki od interfejsu oraz szlify wizualne i lokalizację.
+
+### Zrealizowane zadania
+
+1. **Zachowanie stanu przy zmianie orientacji (Zadanie 1):**
+  - Zastąpiono `remember` wywołaniem `rememberSaveable`, co zapobiega utracie wpisanego działania po zniszczeniu i ponownym utworzeniu aktywności.
+  - W `MainActivity` nadpisano metodę `onSaveInstanceState(outState: Bundle)` i zweryfikowano w dzienniku Logcat (`CalcState`), że stan jest poprawnie przekazywany przez obiekt `Bundle`.
+  - *Inne sytuacje niszczenia aktywności:* poza obrotem ekranu aktywność jest niszczona i odtwarzana m.in. przy zmianie rozmiaru okna w trybie wielookienkowym (split-screen), zmianie motywu systemowego (jasny/ciemny) w trakcie działania aplikacji, zmianie języka urządzenia oraz decyzji systemu o zwolnieniu pamięci RAM (process death).
+
+2. **Silnik obliczeniowy i obsługa biblioteki mXparser (Zadanie 2):**
+  - Do projektu dołączono bibliotekę `org.mariuszgromada.math:MathParser.org-mXparser:6.1.1` za pośrednictwem katalogu wersji (`libs.versions.toml`).
+  - Zadeklarowano niekomercyjny/dydaktyczny charakter użycia biblioteki wywołaniem `License.iConfirmNonCommercialUse(...)`.
+  - Zapewniono obsługę złożonych wyrażeń (kolejność działań, potęgowanie, nawiasy, funkcje trygonometryczne i logarytmiczne).
+
+3. **Oddzielenie logiki i testy jednostkowe (Zadanie 3):**
+  - Obliczenia wydzielono do niezależnego obiektu `CalculatorEngine`, całkowicie odseparowanego od kontekstu Androida (`android.*`), co umożliwia błyskawiczne uruchamianie testów na maszynie JVM.
+  - W pliku `CalculatorTest.kt` zaimplementowano testy JUnit pokrywające tabelę przypadków brzegowych oraz separator dziesiętny:
+    - Kolejność działań (`2+2*2` $\rightarrow$ `6`)
+    - Obsługa nawiasów (`(2+2)*2` $\rightarrow$ `8`)
+    - Dzielenie przez zero (`1/0` $\rightarrow$ czytelny komunikat błędu)
+    - Wyrażenia niedokończone (`2+` $\rightarrow$ brak wyniku, bez awarii)
+    - Nawiasy niezamknięte (`((2+2)` $\rightarrow$ brak wyniku, bez awarii)
+    - Stan początkowy (puste pole $\rightarrow$ brak wyniku i błędu)
+    - Dziedzina funkcji (`sqrt(-1)` $\rightarrow$ czytelny komunikat błędu)
+    - Duże liczby (`1234567890*1234567890` $\rightarrow$ notacja naukowa, stabilny układ)
+    - Separator dziesiętny (obsługa kropki `2.5+1` i przecinka `2,5+1`)
+
+4. **Dopracowanie szczegółów (Zadanie 4):**
+  - **Typografia:** Wdrożono cyfry tabelaryczne (`fontFeatureSettings = "tnum"`), eliminując drganie szerokości tekstu przy wprowadzaniu kolejnych cyfr.
+  - **Ikona adaptacyjna:** Przygotowano autorską ikonę kalkulatora spójną z paletą barw Material 3 (`#001F2A` / `#78D1FF`), uwzględniającą bezpieczną strefę (*safe zone*) oraz wariant monochromatyczny dla Androida 13+.
+  - **Lokalizacja:** Nazwę aplikacji przeniesiono do zasobów (`values/strings.xml` $\rightarrow$ `Calculator`, `values-pl/strings.xml` $\rightarrow$ `Kalkulator`).
