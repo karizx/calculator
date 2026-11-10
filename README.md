@@ -68,3 +68,4 @@ Celem pierwszej części projektu kalkulatora było zbudowanie w pełni responsy
 | Tryb poziomy (Naukowy) |
 |:---:|
 | ![Poziomy](screenshots/landscape.png) |
+
